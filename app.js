@@ -232,61 +232,76 @@ async function calToggle(day, checkbox) {
 // PAGE: HOOK LIBRARY
 // ────────────────────────────────────────────
 function initHooks() {
-  renderHooks('all');
-  document.getElementById('hooks-filter').addEventListener('change', e => renderHooks(e.target.value, document.getElementById('hooks-search').value));
-  document.getElementById('hooks-search').addEventListener('input', e => renderHooks(document.getElementById('hooks-filter').value, e.target.value));
+  renderHooks('p1');
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderHooks(btn.dataset.tab);
+    });
+  });
 }
 
-function renderHooks(pillarFilter, search = '') {
+function renderHooks(tab) {
   const el = document.getElementById('hooks-list');
-  const s = search.toLowerCase();
   let html = '';
 
-  const titleSections = pillarFilter === 'all' ? [['p2', VB_DATA.onScreenTitles.p2], ['p3', VB_DATA.onScreenTitles.p3]]
-    : pillarFilter === 'p2' ? [['p2', VB_DATA.onScreenTitles.p2]]
-    : pillarFilter === 'p3' ? [['p3', VB_DATA.onScreenTitles.p3]] : [];
-
-  if (titleSections.length) {
-    html += '<h3 style="margin-bottom:12px">On-Screen Title Hooks</h3>';
-    titleSections.forEach(([pid, titles]) => {
-      const filtered = titles.filter(t => !s || t.toLowerCase().includes(s));
-      if (!filtered.length) return;
-      html += `<div style="margin-bottom:16px"><div style="margin-bottom:8px">${pillarTag(pid)}</div>`;
-      filtered.forEach(t => {
-        html += `<div class="hook-item"><div class="hook-text">"${t}"</div><div class="hook-meta"><span></span><button class="btn-copy" onclick="copyText('${t.replace(/'/g,"\\'")}', this)">Copy</button></div></div>`;
-      });
-      html += '</div>';
+  if (tab === 'mechanics') {
+    html += '<h3 style="margin-bottom:16px">Hook Mechanics</h3>';
+    html += '<div style="font-size:13px;color:var(--text-dim);margin-bottom:20px;line-height:1.7">These are the structural formulas behind every hook. Use them to build new ideas, not just copy existing ones.</div>';
+    VB_DATA.hookMechanics.forEach(m => {
+      html += `
+        <div class="hook-item" style="margin-bottom:8px">
+          <div style="font-family:'Archivo Black',sans-serif;font-size:14px;color:var(--text);margin-bottom:6px">${m.name}</div>
+          <div style="font-size:13px;color:var(--text-dim);margin-bottom:8px;line-height:1.6">${m.description}</div>
+          <div style="font-size:12px;color:var(--text-faint);line-height:1.6;border-top:1px solid var(--border);padding-top:8px">e.g. ${m.example}</div>
+        </div>`;
     });
-  }
+  } else {
+    const pillar = getPillar(tab);
+    const titles = VB_DATA.onScreenTitles[tab] || [];
+    const spoken = VB_DATA.spokenHooks[tab] || [];
 
-  const spokenSections = pillarFilter === 'all' ? [['p1', VB_DATA.spokenHooks.p1], ['p2', VB_DATA.spokenHooks.p2]]
-    : pillarFilter === 'p1' ? [['p1', VB_DATA.spokenHooks.p1]]
-    : pillarFilter === 'p2' ? [['p2', VB_DATA.spokenHooks.p2]] : [];
+    html += `
+      <div class="card" style="border-left:3px solid ${pillar.color};margin-bottom:20px">
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:4px">${pillar.format}</div>
+        <div style="font-size:13px;color:var(--text-dim)">${pillar.purpose}</div>
+      </div>`;
 
-  if (spokenSections.length) {
-    html += '<h3 style="margin-bottom:12px;margin-top:20px">Spoken Hooks</h3>';
-    spokenSections.forEach(([pid, hooks]) => {
-      const filtered = hooks.filter(h => !s || h.toLowerCase().includes(s));
-      if (!filtered.length) return;
-      html += `<div style="margin-bottom:16px"><div style="margin-bottom:8px">${pillarTag(pid)}</div>`;
-      filtered.forEach(h => {
-        html += `<div class="hook-item"><div class="hook-text">${h}</div><div class="hook-meta"><span></span><button class="btn-copy" onclick="copyText(this.closest('.hook-item').querySelector('.hook-text').textContent, this)">Copy</button></div></div>`;
+    if (titles.length) {
+      html += '<h3 style="margin-bottom:12px">On-Screen Titles</h3>';
+      html += '<div style="font-size:12px;color:var(--text-faint);margin-bottom:14px">3–5 words. All lowercase. Fades by second 4.</div>';
+      titles.forEach(t => {
+        html += `
+          <div class="hook-item">
+            <div class="hook-text">"${t}"</div>
+            <div class="hook-meta"><span></span>
+              <button class="btn-copy" onclick="copyText('${t.replace(/'/g,"\\'")}', this)">Copy</button>
+            </div>
+          </div>`;
       });
-      html += '</div>';
-    });
-  }
+    }
 
-  if (pillarFilter === 'all' || pillarFilter === 'mechanics') {
-    const filtered = VB_DATA.hookMechanics.filter(m => !s || m.name.toLowerCase().includes(s) || m.description.toLowerCase().includes(s));
-    if (filtered.length) {
-      html += '<h3 style="margin-bottom:12px;margin-top:20px">Hook Mechanics</h3>';
-      filtered.forEach(m => {
-        html += `<div class="hook-item"><div style="font-family:'Archivo Black',sans-serif;font-size:13px;margin-bottom:4px">${m.name}</div><div class="hook-text" style="font-style:normal;color:var(--text-dim);font-size:13px">${m.description}</div><div style="font-size:12px;color:var(--text-faint);margin-top:4px;line-height:1.5">e.g. ${m.example}</div></div>`;
+    if (spoken.length) {
+      html += '<h3 style="margin-bottom:12px;margin-top:28px">Spoken Hooks</h3>';
+      html += '<div style="font-size:12px;color:var(--text-faint);margin-bottom:14px">First words out of your mouth. Start mid-sentence.</div>';
+      spoken.forEach(h => {
+        html += `
+          <div class="hook-item">
+            <div class="hook-text">${h}</div>
+            <div class="hook-meta"><span></span>
+              <button class="btn-copy" onclick="copyText(this.closest('.hook-item').querySelector('.hook-text').textContent, this)">Copy</button>
+            </div>
+          </div>`;
       });
+    }
+
+    if (!titles.length && !spoken.length) {
+      html += `<div style="color:var(--text-faint);font-size:13px">No hooks saved for this pillar yet. Generate some in the Idea Bank.</div>`;
     }
   }
 
-  el.innerHTML = html || '<div style="color:var(--text-faint);font-size:14px">No hooks match your search.</div>';
+  el.innerHTML = html;
 }
 
 // ────────────────────────────────────────────

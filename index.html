@@ -157,17 +157,13 @@
     <!-- ── PAGE: Hook Library ── -->
     <div class="page" id="page-hooks">
       <div class="page-title">Hook Library</div>
-      <div class="page-subtitle">All hooks from your system. Tap to copy.</div>
+      <div class="page-subtitle">Everything for each pillar in one place.</div>
 
-      <div style="display:flex;gap:12px;margin-bottom:24px">
-        <select id="hooks-filter" style="width:200px">
-          <option value="all">All hooks</option>
-          <option value="p1">P1 — The Feeling</option>
-          <option value="p2">P2 — The Thought</option>
-          <option value="p3">P3 — The Artist</option>
-          <option value="mechanics">Mechanics only</option>
-        </select>
-        <input id="hooks-search" type="text" placeholder="Search hooks..." style="flex:1">
+      <div class="tab-row">
+        <button class="tab-btn active" data-tab="p1">P1 — The Feeling</button>
+        <button class="tab-btn" data-tab="p2">P2 — The Thought</button>
+        <button class="tab-btn" data-tab="p3">P3 — The Artist</button>
+        <button class="tab-btn" data-tab="mechanics">Mechanics</button>
       </div>
 
       <div id="hooks-list"></div>
