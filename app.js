@@ -43,6 +43,78 @@ function getWeekKey() {
 }
 
 // ────────────────────────────────────────────
+// PAGE: THURSDAY REVIEW
+// ────────────────────────────────────────────
+async function initThursday() {
+  await renderThursdayLatest();
+  await renderThursdayHistory();
+}
+
+async function renderThursdayLatest() {
+  const review = await ThursdayReviews.latest();
+  const el = document.getElementById('thursday-latest');
+  if (!review) return;
+
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+      <div>
+        <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--burgundy);margin-bottom:4px">Latest Review</div>
+        <div style="font-family:'Archivo Black',sans-serif;font-size:16px">${review.date}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--text-dim)">Followers</div>
+        <div style="font-family:'Archivo Black',sans-serif;font-size:22px;color:var(--text)">${Number(review.followers).toLocaleString()}</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="stat-box"><div class="stat-num">${review.views}</div><div class="stat-label">Video Views</div></div>
+      <div class="stat-box"><div class="stat-num">${review.likes}</div><div class="stat-label">Likes</div></div>
+      <div class="stat-box"><div class="stat-num">${review.shares}</div><div class="stat-label">Shares</div></div>
+      <div class="stat-box"><div class="stat-num">${review.searchPct}%</div><div class="stat-label">Search Traffic</div></div>
+    </div>
+
+    ${review.topPost ? `
+    <div style="margin-bottom:16px">
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px">Top Post</div>
+      <div style="font-size:14px;color:var(--text);line-height:1.6">${review.topPost}</div>
+    </div>` : ''}
+
+    <div style="margin-bottom:16px">
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px">Key Insight</div>
+      <div style="font-size:14px;color:var(--text);line-height:1.6">${review.insight}</div>
+    </div>
+
+    <div>
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px">Next Week's Focus</div>
+      <div style="font-size:14px;color:var(--text);line-height:1.8">${review.nextWeek}</div>
+    </div>
+  `;
+}
+
+async function renderThursdayHistory() {
+  const history = await ThursdayReviews.history();
+  const el = document.getElementById('thursday-history');
+  if (!history.length) {
+    el.innerHTML = '<div style="color:var(--text-faint);font-size:13px">No previous reviews yet.</div>';
+    return;
+  }
+  el.innerHTML = history.slice(1).map(r => `
+    <div class="hook-item" style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:2px">${r.date}</div>
+          <div style="font-size:13px;color:var(--text)">${r.insight}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:16px">
+          <div style="font-size:11px;color:var(--text-faint)">followers</div>
+          <div style="font-family:'Archivo Black',sans-serif;font-size:15px">${Number(r.followers).toLocaleString()}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ────────────────────────────────────────────
 // PAGE: DAILY CHECK-IN
 // ────────────────────────────────────────────
 async function initCheckin() {
@@ -454,6 +526,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Init all pages in parallel
   await Promise.all([
+    initThursday(),
     initCheckin(),
     initCalendar(),
     initAnalytics(),

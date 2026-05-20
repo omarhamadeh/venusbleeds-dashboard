@@ -92,3 +92,21 @@ const Settings = {
     await db.from('settings').upsert({ key, value: String(value) }, { onConflict: 'key' });
   },
 };
+
+// ── Thursday Reviews ──
+const ThursdayReviews = {
+  async latest() {
+    const val = await Settings.get('thursday_latest');
+    return val ? JSON.parse(val) : null;
+  },
+  async history() {
+    const val = await Settings.get('thursday_history');
+    return val ? JSON.parse(val) : [];
+  },
+  async save(review) {
+    const history = await this.history();
+    history.unshift(review);
+    await Settings.set('thursday_latest', JSON.stringify(review));
+    await Settings.set('thursday_history', JSON.stringify(history.slice(0, 12)));
+  },
+};
