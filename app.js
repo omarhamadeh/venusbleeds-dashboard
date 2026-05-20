@@ -130,15 +130,19 @@ async function initCalendar() {
     const isDone = checked[day.day] || false;
 
     return `
-      <div class="cal-day ${isToday ? 'today' : ''} ${isRest ? 'rest' : ''}">
-        <div class="cal-day-name">${day.day}${isToday ? ' · today' : ''}</div>
-        ${pillar ? `<div class="cal-pillar">P${pillar.number} — ${pillar.name}</div>` : '<div class="cal-pillar" style="color:var(--text-faint)">Rest</div>'}
-        <div class="cal-note">${day.note}</div>
-        ${!isRest ? `
-          <label class="cal-check ${isDone ? 'done' : ''}" data-day="${day.day}">
-            <input type="checkbox" ${isDone ? 'checked' : ''} onchange="calToggle('${day.day}', this)">
-            ${isDone ? 'Posted' : 'Mark posted'}
-          </label>` : ''}
+      <div class="cal-row ${isToday ? 'today' : ''} ${isRest ? 'rest' : ''}">
+        <div class="cal-row-left">
+          <div class="cal-day-name">${day.day}${isToday ? ' · today' : ''}</div>
+          ${pillar ? `<div class="cal-pillar">P${pillar.number} — ${pillar.name}</div>` : '<div class="cal-pillar" style="color:var(--text-faint)">Rest</div>'}
+          <div class="cal-note">${day.note}</div>
+        </div>
+        <div class="cal-row-right">
+          ${!isRest ? `
+            <label class="cal-check ${isDone ? 'done' : ''}" data-day="${day.day}">
+              <input type="checkbox" ${isDone ? 'checked' : ''} onchange="calToggle('${day.day}', this)">
+              ${isDone ? 'Posted' : 'Post'}
+            </label>` : ''}
+        </div>
       </div>`;
   }).join('');
 }
