@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Venus Bleeds — Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Sidebar Nav ── -->
+  <nav>
+    <div class="nav-logo">
+      <h1>Venus Bleeds</h1>
+      <span>Content Dashboard</span>
+    </div>
+    <div class="nav-links">
+      <div class="nav-link" data-page="checkin"><span class="icon">◎</span> Daily Check-In</div>
+      <div class="nav-link" data-page="calendar"><span class="icon">▦</span> Week Calendar</div>
+      <div class="nav-link" data-page="ideas"><span class="icon">✦</span> Content Ideas</div>
+      <div class="nav-link" data-page="hooks"><span class="icon">⌯</span> Hook Library</div>
+      <div class="nav-link" data-page="captions"><span class="icon">⌘</span> Captions</div>
+      <div class="nav-link" data-page="analytics"><span class="icon">◈</span> Analytics</div>
+      <div class="nav-link" data-page="competitors"><span class="icon">◉</span> Competitors</div>
+      <div class="nav-link" data-page="pillars"><span class="icon">▣</span> Pillars</div>
+    </div>
+    <div class="nav-footer">@venusbleeds · path to 100K</div>
+  </nav>
+
+  <!-- ── Main Content ── -->
+  <main>
+
+    <!-- ── PAGE: Daily Check-In ── -->
+    <div class="page" id="page-checkin">
+      <div class="page-title">Daily Check-In</div>
+      <div id="checkin-date" class="page-subtitle"></div>
+
+      <div class="grid-2">
+        <div>
+          <div class="card accent">
+            <h3>Today's Pillar</h3>
+            <div id="checkin-today-pillar"></div>
+          </div>
+
+          <div class="card">
+            <h3>Energy check</h3>
+            <div class="mood-row">
+              <button class="mood-btn" data-mood="fired">Fired up</button>
+              <button class="mood-btn" data-mood="calm">Calm &amp; present</button>
+              <button class="mood-btn" data-mood="raw">Raw / emotional</button>
+              <button class="mood-btn" data-mood="tired">Tired but here</button>
+              <button class="mood-btn" data-mood="scattered">Scattered</button>
+            </div>
+            <div class="field">
+              <label>Energy level / what's present today</label>
+              <textarea id="checkin-energy" rows="2" placeholder="what are you actually feeling right now..."></textarea>
+            </div>
+            <div class="field">
+              <label>Intention for today's post</label>
+              <textarea id="checkin-intention" rows="2" placeholder="who is this for. what do you want them to feel."></textarea>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Yesterday's post</h3>
+            <div class="field">
+              <label>What did you post?</label>
+              <input id="checkin-yesterday" type="text" placeholder="brief description...">
+            </div>
+            <div class="field">
+              <label>How did it perform? Any surprises?</label>
+              <textarea id="checkin-yesterday-perf" rows="2" placeholder="views, saves, anything notable..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3>The 8 Rules</h3>
+            <div id="checkin-rules"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: Week Calendar ── -->
+    <div class="page" id="page-calendar">
+      <div class="page-title">Week Calendar</div>
+      <div class="page-subtitle">5–6 posts per week. Thursday is weekly review day.</div>
+      <div class="grid-3" id="calendar-grid" style="grid-template-columns:repeat(7,1fr);gap:10px;"></div>
+      <div class="card" style="margin-top:24px">
+        <h3>Thursday ritual</h3>
+        <div style="font-size:14px;color:var(--text-dim);line-height:1.7">Every Thursday: review your top 3 posts, worst performer, one surprise. Rebuild next week's calendar from real numbers — never plan blindly.</div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: Idea Bank ── -->
+    <div class="page" id="page-ideas">
+      <div class="page-title">Idea Bank</div>
+      <div class="page-subtitle">Generate ideas with Claude in chat, paste and save the best ones here.</div>
+
+      <div class="card">
+        <div class="api-notice">
+          Ask Claude (in this chat or your Claude.ai Project) to generate ideas using your Venus Bleeds system. Copy the result and save it here.
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Pillar</label>
+            <select id="idea-pillar">
+              <option value="p1">P1 — The Feeling</option>
+              <option value="p2">P2 — The Thought</option>
+              <option value="p3">P3 — The Artist</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Paste idea from Claude</label>
+          <textarea id="idea-text" rows="5" placeholder="Paste the full idea here — on-screen title, spoken hook, caption, hashtags..."></textarea>
+        </div>
+        <button class="btn" onclick="saveNewIdea()">Save idea</button>
+      </div>
+
+      <div style="margin-top:24px">
+        <h3>Saved Ideas</h3>
+        <div id="saved-ideas-list"></div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: Hook Library ── -->
+    <div class="page" id="page-hooks">
+      <div class="page-title">Hook Library</div>
+      <div class="page-subtitle">All hooks from your system. Tap to copy.</div>
+
+      <div style="display:flex;gap:12px;margin-bottom:24px">
+        <select id="hooks-filter" style="width:200px">
+          <option value="all">All hooks</option>
+          <option value="p1">P1 — The Feeling</option>
+          <option value="p2">P2 — The Thought</option>
+          <option value="p3">P3 — The Artist</option>
+          <option value="mechanics">Mechanics only</option>
+        </select>
+        <input id="hooks-search" type="text" placeholder="Search hooks..." style="flex:1">
+      </div>
+
+      <div id="hooks-list"></div>
+    </div>
+
+    <!-- ── PAGE: Captions ── -->
+    <div class="page" id="page-captions">
+      <div class="page-title">Captions & Hashtags</div>
+      <div class="page-subtitle">Pre-built formulas by video type. Tap to copy.</div>
+      <div id="captions-list"></div>
+    </div>
+
+    <!-- ── PAGE: Analytics ── -->
+    <div class="page" id="page-analytics">
+      <div class="page-title">Analytics</div>
+      <div class="page-subtitle">Track your path to 100K. Manual entry — honest data.</div>
+
+      <div class="card">
+        <h3>Follower Count</h3>
+        <div class="field" style="max-width:200px">
+          <label>Current followers</label>
+          <input id="analytics-followers-input" type="number" placeholder="26500">
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span id="progress-pct">26.5%</span>
+            <span id="progress-remaining"></span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:26.5%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-faint);margin-top:6px">
+            <span>0</span>
+            <span>Goal: <span id="stat-goal">100,000</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-bottom:20px">
+        <div class="stat-box"><div class="stat-num" id="stat-followers">26,500</div><div class="stat-label">Followers</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-posts">0</div><div class="stat-label">Posts logged</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-best-views">—</div><div class="stat-label">Best post views</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-avg-views">—</div><div class="stat-label">Avg views</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Log a post</h3>
+        <div class="grid-2">
+          <div class="field">
+            <label>Pillar</label>
+            <select id="log-pillar">
+              <option value="">Select pillar...</option>
+              <option value="p1">P1 — The Feeling</option>
+              <option value="p2">P2 — The Thought</option>
+              <option value="p3">P3 — The Artist</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Views</label>
+            <input id="log-views" type="number" placeholder="0">
+          </div>
+          <div class="field">
+            <label>Likes</label>
+            <input id="log-likes" type="number" placeholder="0">
+          </div>
+          <div class="field">
+            <label>Saves</label>
+            <input id="log-saves" type="number" placeholder="0">
+          </div>
+          <div class="field">
+            <label>Shares</label>
+            <input id="log-shares" type="number" placeholder="0">
+          </div>
+        </div>
+        <div class="field">
+          <label>Notes (optional)</label>
+          <input id="log-note" type="text" placeholder="what worked, what didn't, any surprise...">
+        </div>
+        <button class="btn" onclick="addPostLog()">Log post</button>
+      </div>
+
+      <div style="margin-top:8px">
+        <h3>Post history</h3>
+        <div id="post-log-list"></div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: Competitors ── -->
+    <div class="page" id="page-competitors">
+      <div class="page-title">Competitor Tracker</div>
+      <div class="page-subtitle">Add who you're watching. Log what you notice.</div>
+
+      <div class="card">
+        <h3>Add competitor</h3>
+        <div class="grid-2">
+          <div class="field">
+            <label>TikTok handle</label>
+            <input id="comp-handle" type="text" placeholder="@handle">
+          </div>
+          <div class="field">
+            <label>Why you're watching them</label>
+            <input id="comp-why" type="text" placeholder="e.g. queer Arab creator, fast growth...">
+          </div>
+        </div>
+        <button class="btn" onclick="addCompetitor()">Add</button>
+      </div>
+
+      <div style="margin-top:8px">
+        <h3>Tracked accounts</h3>
+        <div id="competitors-list"></div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>What to watch for</h3>
+        <div style="font-size:13px;color:var(--text-dim);line-height:1.8">
+          · Hook format — how do they open?<br>
+          · Posting frequency and pillar rhythm<br>
+          · What formats are getting shares (not just likes)<br>
+          · Growth patterns — when did they spike?<br>
+          · Comment section — what is the audience saying?
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: Pillars ── -->
+    <div class="page" id="page-pillars">
+      <div class="page-title">Content Pillars</div>
+      <div class="page-subtitle">Three pillars. Every piece of content maps to one.</div>
+
+      <div id="pillars-detail"></div>
+
+      <div class="card" style="margin-top:8px">
+        <h3>What NOT to do</h3>
+        <div id="donts-list"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script src="data.js"></script>
+<script src="db.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
