@@ -131,12 +131,19 @@ async function initCheckin() {
   const todayPillarEl = document.getElementById('checkin-today-pillar');
   if (pillar) {
     todayPillarEl.innerHTML = `
-      <div class="pillar-num">Pillar ${pillar.number}</div>
-      <div class="pillar-name">${pillar.name}</div>
-      <div class="pillar-desc" style="margin-top:8px">${pillar.format}</div>
-      <div class="pillar-desc" style="margin-top:4px;color:var(--text-dim)">${pillar.purpose}</div>`;
+      <div class="today-pillar-banner ${pillar.id}">
+        <div class="pillar-banner-label" style="color:var(--${pillar.id})">Pillar ${pillar.number} — Today</div>
+        <div class="pillar-banner-name" style="color:var(--${pillar.id})">${pillar.name}</div>
+        <div class="pillar-banner-desc">${pillar.format}</div>
+        <div class="pillar-banner-desc" style="margin-top:6px;opacity:0.6">${pillar.purpose}</div>
+      </div>`;
   } else {
-    todayPillarEl.innerHTML = `<div class="pillar-desc" style="color:var(--text-dim)">Rest day. No post scheduled.</div>`;
+    todayPillarEl.innerHTML = `
+      <div class="today-pillar-banner rest">
+        <div class="pillar-banner-label" style="color:var(--text-faint)">Today</div>
+        <div class="pillar-banner-name" style="color:var(--text-dim);font-size:20px">Rest Day</div>
+        <div class="pillar-banner-desc">No post scheduled. Recharge.</div>
+      </div>`;
   }
 
   // Load saved check-in
@@ -145,8 +152,6 @@ async function initCheckin() {
     if (saved.mood) document.querySelectorAll('.mood-btn').forEach(b => { if (b.dataset.mood === saved.mood) b.classList.add('selected'); });
     if (saved.energy) document.getElementById('checkin-energy').value = saved.energy;
     if (saved.intention) document.getElementById('checkin-intention').value = saved.intention;
-    if (saved.yesterday_post) document.getElementById('checkin-yesterday').value = saved.yesterday_post;
-    if (saved.yesterday_perf) document.getElementById('checkin-yesterday-perf').value = saved.yesterday_perf;
   }
 
   let saveTimer;
@@ -161,8 +166,6 @@ async function initCheckin() {
       mood,
       energy: document.getElementById('checkin-energy').value,
       intention: document.getElementById('checkin-intention').value,
-      yesterday_post: document.getElementById('checkin-yesterday').value,
-      yesterday_perf: document.getElementById('checkin-yesterday-perf').value,
     });
   }
 
@@ -174,7 +177,7 @@ async function initCheckin() {
     });
   });
 
-  ['checkin-energy','checkin-intention','checkin-yesterday','checkin-yesterday-perf'].forEach(id => {
+  ['checkin-energy','checkin-intention'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', scheduleSave);
   });
@@ -205,7 +208,7 @@ async function initCalendar() {
       <div class="cal-row ${isToday ? 'today' : ''} ${isRest ? 'rest' : ''}">
         <div class="cal-row-left">
           <div class="cal-day-name">${day.day}${isToday ? ' · today' : ''}</div>
-          ${pillar ? `<div class="cal-pillar">P${pillar.number} — ${pillar.name}</div>` : '<div class="cal-pillar" style="color:var(--text-faint)">Rest</div>'}
+          ${pillar ? `<div class="cal-pillar ${day.pillar}">P${pillar.number} — ${pillar.name}</div>` : '<div class="cal-pillar" style="color:var(--text-faint)">Rest</div>'}
           <div class="cal-note">${day.note}</div>
         </div>
         <div class="cal-row-right">

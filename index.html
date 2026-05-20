@@ -38,15 +38,12 @@
       <div class="page-title">Daily Check-In</div>
       <div id="checkin-date" class="page-subtitle"></div>
 
+      <div id="checkin-today-pillar"></div>
+
       <div class="grid-2">
         <div>
-          <div class="card accent">
-            <h3>Today's Pillar</h3>
-            <div id="checkin-today-pillar"></div>
-          </div>
-
           <div class="card">
-            <h3>Energy check</h3>
+            <h3>Energy</h3>
             <div class="mood-row">
               <button class="mood-btn" data-mood="fired">Fired up</button>
               <button class="mood-btn" data-mood="calm">Calm &amp; present</button>
@@ -55,24 +52,12 @@
               <button class="mood-btn" data-mood="scattered">Scattered</button>
             </div>
             <div class="field">
-              <label>Energy level / what's present today</label>
-              <textarea id="checkin-energy" rows="2" placeholder="what are you actually feeling right now..."></textarea>
+              <label>What's present right now</label>
+              <textarea id="checkin-energy" rows="2" placeholder="what you're actually feeling..."></textarea>
             </div>
-            <div class="field">
+            <div class="field" style="margin-bottom:0">
               <label>Intention for today's post</label>
               <textarea id="checkin-intention" rows="2" placeholder="who is this for. what do you want them to feel."></textarea>
-            </div>
-          </div>
-
-          <div class="card">
-            <h3>Yesterday's post</h3>
-            <div class="field">
-              <label>What did you post?</label>
-              <input id="checkin-yesterday" type="text" placeholder="brief description...">
-            </div>
-            <div class="field">
-              <label>How did it perform? Any surprises?</label>
-              <textarea id="checkin-yesterday-perf" rows="2" placeholder="views, saves, anything notable..."></textarea>
             </div>
           </div>
         </div>

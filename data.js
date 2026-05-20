@@ -34,7 +34,7 @@ const VB_DATA = {
       mechanics: "Back-to-camera, POV framing, visual incompleteness, no face required.",
       textRule: "Optional but powerful. 3–5 words max.",
       hashtags: ["#queerarab", "#arabdiaspora", "#queertiktok", "#fyp", "#venusbleeds"],
-      color: "#c0392b",
+      color: "#FF3B7A",
     },
     {
       id: "p2",
@@ -46,7 +46,7 @@ const VB_DATA = {
       mechanics: "Start mid-sentence or mid-action. First word IS the hook.",
       textRule: "3–5 word phrase, all lowercase, fades by second 4, never repeats what's spoken.",
       hashtags: ["#queerarab", "#arabqueer", "#arabmen", "#queertiktok", "#venusbleeds"],
-      color: "#8B1A1A",
+      color: "#F0A500",
     },
     {
       id: "p3",
@@ -58,7 +58,7 @@ const VB_DATA = {
       mechanics: "Talk about music, influence, creative process as a creative peer.",
       textRule: "On-screen title optional. Same rules — lowercase, minimal.",
       hashtags: ["#independentartist", "#darkpop", "#queerartist", "#altpop", "#venusbleeds"],
-      color: "#5a1010",
+      color: "#7C5CEF",
     },
   ],
 
