@@ -466,14 +466,109 @@ button {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
 
-/* ── Responsive ── */
+/* ── Responsive / Mobile ── */
 @media (max-width: 768px) {
-  nav { width: 100%; min-width: 100%; position: relative; flex-direction: row; flex-wrap: wrap; border-right: none; border-bottom: 1px solid var(--border); }
+  /* Hide sidebar, show bottom nav */
+  nav {
+    width: 100%;
+    min-width: 100%;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: auto;
+    flex-direction: column;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    z-index: 200;
+    background: var(--bg2);
+  }
+
+  .nav-logo { display: none; }
+  .nav-footer { display: none; }
+
+  .nav-links {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+
+  .nav-link {
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px 12px;
+    border-left: none;
+    border-top: 2px solid transparent;
+    border-bottom: none;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    gap: 4px;
+    min-width: 70px;
+    text-align: center;
+  }
+  .nav-link .icon {
+    font-size: 18px;
+    width: auto;
+    display: block;
+  }
+  .nav-link.active {
+    border-left: none;
+    border-top-color: var(--burgundy);
+    color: var(--text);
+    background: transparent;
+  }
+
+  /* Main content */
   #app { flex-direction: column; }
-  main { margin-left: 0; padding: 20px; }
+  main {
+    margin-left: 0;
+    padding: 20px 16px;
+    padding-bottom: 90px; /* space for bottom nav */
+  }
+
+  /* Mobile header */
+  main::before {
+    content: 'Venus Bleeds';
+    display: block;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--burgundy);
+    margin-bottom: 20px;
+  }
+
+  /* Stacked grids */
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
-  .nav-logo { padding: 16px; border-bottom: none; }
-  .nav-links { display: flex; flex-direction: row; padding: 8px; overflow-x: auto; }
-  .nav-link { padding: 8px 12px; border-left: none; border-bottom: 2px solid transparent; white-space: nowrap; }
-  .nav-link.active { border-left: none; border-bottom-color: var(--burgundy); }
+
+  /* Calendar scrolls horizontally */
+  #calendar-grid {
+    grid-template-columns: repeat(7, minmax(110px, 1fr)) !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+
+  /* Bigger tap targets */
+  .btn { padding: 13px 22px; font-size: 14px; }
+  .mood-btn { padding: 10px 18px; font-size: 14px; }
+  input, textarea, select { font-size: 16px; } /* prevents iOS zoom */
+
+  /* Card padding */
+  .card { padding: 18px; }
+
+  /* Page title */
+  .page-title { font-size: 18px; }
+  .page-subtitle { font-size: 12px; margin-bottom: 20px; }
+
+  /* Stat boxes */
+  .stat-num { font-size: 24px; }
 }
