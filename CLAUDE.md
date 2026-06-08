@@ -21,7 +21,7 @@ Full brand brief: ~/Downloads/venusbleeds-developer-handoff.md
 - Pure HTML/CSS/JS (no framework, no build step)
 - Supabase for cross-device data sync
 - Netlify for hosting (auto-deploys on GitHub push)
-- Live URL: aquamarine-lollipop-c9b099.netlify.app
+- Live URL: venusbleeds-dashboard.netlify.app
 - GitHub: github.com/omarhamadeh/venusbleeds-dashboard
 
 ## Supabase
