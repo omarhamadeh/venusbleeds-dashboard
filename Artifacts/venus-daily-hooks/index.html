@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Venus Daily Hooks",
+  "schemaVersion": 1,
+  "description": "Venus Bleeds daily hooks dashboard — generates 3 fresh hooks (P1, P2, wildcard) on load using the full Venus Bleeds brief and current analytics context. Dark editorial aesthetic. Includes today's priority and analytics note."
+}
+</script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Venus Bleeds — Daily Hooks</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #080808;
+      color: #f0ebe3;
+      font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+    }
+    .header {
+      padding: 28px 20px 22px;
+      border-bottom: 1px solid #1e1e1e;
+    }
+    .wordmark {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #c41e3a;
+      margin-bottom: 6px;
+    }
+    .date {
+      font-size: 24px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .subtitle {
+      font-size: 11px;
+      color: #505050;
+      margin-top: 5px;
+    }
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 72px 20px;
+      gap: 20px;
+    }
+    .dots { display: flex; gap: 9px; }
+    .dot {
+      width: 5px; height: 5px;
+      background: #c41e3a;
+      border-radius: 50%;
+      animation: blink 1.3s ease-in-out infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink {
+      0%,80%,100% { opacity: 0.15; transform: scale(0.75); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+    .loading-label {
+      font-size: 11px;
+      color: #505050;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .priority {
+      margin: 18px 18px 0;
+      padding: 14px 15px;
+      background: rgba(139,0,0,0.1);
+      border: 1px solid rgba(196,30,58,0.2);
+      border-left: 3px solid #c41e3a;
+      border-radius: 5px;
+    }
+    .priority-label {
+      font-size: 8px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #c41e3a;
+      margin-bottom: 6px;
+    }
+    .priority-text { font-size: 13px; line-height: 1.55; }
+    .analytics-note {
+      padding: 13px 20px;
+      font-size: 12px;
+      color: #505050;
+      font-style: italic;
+      border-bottom: 1px solid #1e1e1e;
+      line-height: 1.5;
+    }
+    .hooks { padding: 18px 18px 4px; display: flex; flex-direction: column; gap: 14px; }
+    .card {
+      background: #111;
+      border: 1px solid #282828;
+      border-radius: 9px;
+      overflow: hidden;
+    }
+    .card-head {
+      padding: 11px 14px;
+      border-bottom: 1px solid #1e1e1e;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .badge {
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 3px;
+      background: #8b0000;
+      color: #f0ebe3;
+      flex-shrink: 0;
+    }
+    .badge.wild {
+      background: transparent;
+      border: 1px solid #2e2e2e;
+      color: #505050;
+    }
+    .territory { font-size: 11px; color: #505050; flex: 1; min-width: 0; }
+    .mechanic { font-size: 8px; color: #2e2e2e; letter-spacing: 0.1em; text-transform: uppercase; }
+    .card-body { padding: 15px; }
+    .onscreen-label {
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #505050;
+      margin-bottom: 9px;
+    }
+    .onscreen-text {
+      font-size: 18px;
+      font-weight: 300;
+      line-height: 1.45;
+      font-style: italic;
+      letter-spacing: -0.01em;
+      margin-bottom: 16px;
+      white-space: pre-line;
+    }
+    .meta { display: flex; flex-direction: column; gap: 9px; }
+    .meta-row { display: flex; gap: 9px; align-items: baseline; }
+    .meta-key {
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #505050;
+      min-width: 52px;
+      flex-shrink: 0;
+    }
+    .meta-val { font-size: 12px; color: #999; line-height: 1.5; }
+    .meta-val.cap { font-style: italic; color: #f0ebe3; }
+    .meta-val.tags { color: rgba(196,30,58,0.65); font-size: 11px; }
+    .note {
+      margin-top: 10px;
+      padding: 8px 10px;
+      background: #181818;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #505050;
+      font-style: italic;
+      line-height: 1.4;
+    }
+    .footer { padding: 18px 18px 36px; }
+    .refresh-btn {
+      width: 100%;
+      padding: 13px;
+      background: transparent;
+      border: 1px solid #282828;
+      border-radius: 6px;
+      color: #505050;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .refresh-btn:hover:not(:disabled) { border-color: #c41e3a; color: #f0ebe3; }
+    .refresh-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .error {
+      padding: 40px 20px;
+      text-align: center;
+      color: #505050;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .error-detail {
+      margin-top: 10px;
+      font-size: 10px;
+      color: #333;
+      word-break: break-all;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="wordmark">venus bleeds</div>
+  <div class="date" id="today-date"></div>
+  <div class="subtitle">daily hooks</div>
+</div>
+
+<div id="s-loading" class="loading">
+  <div class="dots">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+  <div class="loading-label">reading the room</div>
+</div>
+
+<div id="s-content" class="hidden">
+  <div class="priority">
+    <div class="priority-label">today's priority</div>
+    <div class="priority-text" id="priority"></div>
+  </div>
+  <div class="analytics-note" id="analytics-note"></div>
+  <div class="hooks" id="hooks"></div>
+  <div class="footer">
+    <button class="refresh-btn" id="refresh-btn" onclick="load()">↻ &nbsp;regenerate</button>
+  </div>
+</div>
+
+<div id="s-error" class="error hidden">
+  couldn't generate hooks.<br>
+  <span id="err-msg"></span>
+  <div style="margin-top:16px">
+    <button class="refresh-btn" onclick="load()" style="width:auto;padding:10px 20px">retry</button>
+  </div>
+</div>
+
+<script>
+  const now = new Date();
+  document.getElementById('today-date').textContent =
+    now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' }).toLowerCase();
+
+  function show(id) {
+    ['s-loading','s-content','s-error'].forEach(s =>
+      document.getElementById(s).classList.toggle('hidden', s !== id)
+    );
+  }
+
+  function extractJSON(str) {
+    if (typeof str !== 'string') str = JSON.stringify(str);
+    // Try direct parse first
+    try { return JSON.parse(str); } catch(e) {}
+    // Strip markdown fences
+    const stripped = str.replace(/^[\s\S]*?```(?:json)?\s*/i,'').replace(/\s*```[\s\S]*$/i,'').trim();
+    try { return JSON.parse(stripped); } catch(e) {}
+    // Find first { ... } block
+    const m = str.match(/\{[\s\S]*\}/);
+    if (m) { try { return JSON.parse(m[0]); } catch(e) {} }
+    throw new Error('Could not parse response as JSON');
+  }
+
+  function render(data) {
+    document.getElementById('priority').textContent = data.priority || '';
+    document.getElementById('analytics-note').textContent = data.analytics_note || '';
+
+    const container = document.getElementById('hooks');
+    container.innerHTML = '';
+
+    (data.hooks || []).forEach(h => {
+      const wild = h.type === 'WILDCARD';
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-head">
+          <span class="badge ${wild ? 'wild' : ''}">${h.type || ''}</span>
+          <span class="territory">${h.territory || ''}</span>
+          <span class="mechanic">${h.mechanic || ''}</span>
+        </div>
+        <div class="card-body">
+          <div class="onscreen-label">on screen</div>
+          <div class="onscreen-text">${(h.onscreen || '').replace(/\\n/g, '\n')}</div>
+          <div class="meta">
+            <div class="meta-row">
+              <span class="meta-key">caption</span>
+              <span class="meta-val cap">${h.caption || ''}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-key">tags</span>
+              <span class="meta-val tags">${h.hashtags || ''}</span>
+            </div>
+          </div>
+          ${h.note ? `<div class="note">${h.note}</div>` : ''}
+        </div>`;
+      container.appendChild(card);
+    });
+
+    show('s-content');
+    const btn = document.getElementById('refresh-btn');
+    if (btn) btn.disabled = false;
+  }
+
+  async function load() {
+    show('s-loading');
+    const btn = document.getElementById('refresh-btn');
+    if (btn) btn.disabled = true;
+
+    const BRIEF = `You are Creative Strategist for Venus Bleeds (@venusbleeds) — queer Lebanese musician, Paris, Beirut-born. Dark/alt pop. Label: Burning Sanctuary. Single: The Unself (2026). ~26.5K TikTok followers → 100K goal. Audience: queer Arab/MENA diaspora men 18–32.
+
+CONTEXT (Jun 2026): 1.2M views last 7d (+4369%). Viral #hijab P1 4 days ago — 1.1M views, 509 followers, 0.08% conversion. Wrong room. No #hijab hashtag going forward. Reply post today: 346 likes/2732 views = 12.7% like rate (core audience activated). White feminism P2 script confirmed, NOT yet filmed. Next P1 queued: "it's all body positivity until the body is Arab." Queued territories: shapeshifter, Arab diaspora in Paris, both-wrong, savior syllabus, dress code.
+
+VOICE: Intimate, declarative, specific. Never performative. Never therapy-speak. All lowercase on-screen. First word IS the hook. Agency framing — Venus watches and names the structure.
+
+MECHANICS: (1) Incomplete Truth — can't resolve without next sentence. (2) Named Stake — name specific subject most won't say. (3) Direct Address — surgical specificity, end with "stay"/"this is for you". (4) Interrupted Delivery (P2 only).
+
+RULES: P1: 5–15s loopable. P2: 60–90s max, opens in something real, thinking-out-loud, sharpest line mid-script, trails off. 3–5 hashtags always ending #venusbleeds. NEVER: #fyp #foryourpage #hijab. NEVER: "hey guys", wellness-speak, hooks that could belong to anyone else.
+
+Generate 3 hooks (P1, P2, WILDCARD) distinct in territory and mechanic.
+
+Reply with ONLY this JSON, nothing else before or after:
+{
+  "analytics_note": "one sentence on what today's data says",
+  "priority": "one sentence — what to film today and exactly why",
+  "hooks": [
+    {"type":"P1","territory":"...","mechanic":"...","onscreen":"hook text — use \\n for line breaks","caption":"...","hashtags":"...","note":"filming note or null"},
+    {"type":"P2","territory":"...","mechanic":"...","onscreen":"3–5 word title lowercase","caption":"...","hashtags":"...","note":"..."},
+    {"type":"WILDCARD","territory":"...","mechanic":"...","onscreen":"...","caption":"...","hashtags":"...","note":null}
+  ]
+}`;
+
+    try {
+      const raw = await window.cowork.askClaude(BRIEF);
+      const data = extractJSON(raw);
+      render(data);
+    } catch(e) {
+      document.getElementById('err-msg').textContent = e.message || 'unknown error';
+      show('s-error');
+      console.error('hooks error:', e);
+    }
+  }
+
+  load();
+</script>
+</body>
+</html>
