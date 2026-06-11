@@ -93,6 +93,54 @@ const Settings = {
   },
 };
 
+// ── Briefs (the shoot queue) ──
+// The whole queue + archive live as JSON in the settings table.
+// No schema migration needed — same trick ThursdayReviews uses.
+const Briefs = {
+  async queue() {
+    const val = await Settings.get('brief_queue');
+    return val ? JSON.parse(val) : [];
+  },
+  async archive() {
+    const val = await Settings.get('brief_archive');
+    return val ? JSON.parse(val) : [];
+  },
+  async saveQueue(queue) {
+    await Settings.set('brief_queue', JSON.stringify(queue));
+  },
+  // Replace the whole queue (used when Claude refills it on demand).
+  async setQueue(queue) {
+    await this.saveQueue(queue);
+  },
+  // The one brief to shoot right now = top of the queue.
+  async current() {
+    const q = await this.queue();
+    return q[0] || null;
+  },
+  // Resolve a brief (status: 'posted' | 'skipped'): pull it out, archive it, advance.
+  async resolve(id, status) {
+    const q = await this.queue();
+    const idx = q.findIndex(b => b.id === id);
+    if (idx === -1) return;
+    const [b] = q.splice(idx, 1);
+    b.status = status;
+    b.resolvedAt = new Date().toISOString();
+    const arch = await this.archive();
+    arch.unshift(b);
+    await this.saveQueue(q);
+    await Settings.set('brief_archive', JSON.stringify(arch.slice(0, 60)));
+  },
+  // Send the current brief to the back of the queue.
+  async snooze(id) {
+    const q = await this.queue();
+    const idx = q.findIndex(b => b.id === id);
+    if (idx === -1) return;
+    const [b] = q.splice(idx, 1);
+    q.push(b);
+    await this.saveQueue(q);
+  },
+};
+
 // ── Thursday Reviews ──
 const ThursdayReviews = {
   async latest() {

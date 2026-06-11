@@ -25,6 +25,7 @@ function navigate(pageId) {
   if (page) page.classList.add('active');
   if (link) link.classList.add('active');
   localStorage.setItem('vb_lastPage', pageId);
+  if (pageId === 'brief' && typeof renderBrief === 'function') renderBrief();
 }
 
 // ── Pillar helpers ──
@@ -40,6 +41,147 @@ function getWeekKey() {
   const startOfYear = new Date(d.getFullYear(), 0, 1);
   const week = Math.ceil(((d - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
   return d.getFullYear() + '_w' + week;
+}
+
+// ────────────────────────────────────────────
+// PAGE: THE BRIEF  (the decisive next shot)
+// ────────────────────────────────────────────
+async function initBrief() {
+  await seedBriefsIfNeeded();
+  await renderBrief();
+}
+
+// One-time seed: loads the starter queue into Supabase on first ever open.
+// Guarded by the 'brief_seeded' flag so it never re-seeds after you start posting.
+async function seedBriefsIfNeeded() {
+  const seeded = await Settings.get('brief_seeded');
+  if (seeded === 'yes') return;
+  const existing = await Briefs.queue();
+  if (!existing.length && typeof VB_SEED_BRIEFS !== 'undefined') {
+    await Briefs.setQueue(VB_SEED_BRIEFS);
+  }
+  await Settings.set('brief_seeded', 'yes');
+}
+
+async function renderBrief() {
+  const root = document.getElementById('brief-root');
+  if (!root) return;
+  const queue = await Briefs.queue();
+  const b = queue[0] || null;
+
+  // Empty state
+  if (!b) {
+    root.innerHTML = `
+      <div class="brief-empty">
+        <div class="brief-empty-mark">◆</div>
+        <div class="brief-empty-title">Queue's empty.</div>
+        <div class="brief-empty-sub">Open a chat with me and say <span class="brief-kbd">fill my queue</span> — I'll pull your latest numbers and load new briefs straight off the strategy.</div>
+      </div>`;
+    return;
+  }
+
+  const p = getPillar(b.pillar);
+  const total = queue.length;
+
+  // On-screen text: split " / " beats into stacked lines
+  const beats = (b.onScreen || '').split(' / ').filter(Boolean);
+  const onScreenHtml = beats.length
+    ? beats.map(line => `<div class="brief-beat">${line}</div>`).join('')
+    : '<div class="brief-beat" style="color:var(--text-faint)">— none, caption does the work —</div>';
+
+  // Queue peek (everything after the current one)
+  const rest = queue.slice(1);
+  const peekHtml = rest.length
+    ? `<details class="brief-peek">
+         <summary>${rest.length} more in the queue</summary>
+         <div class="brief-peek-list">
+           ${rest.map((x, i) => {
+             const xp = getPillar(x.pillar);
+             return `<div class="brief-peek-row">
+               <span class="brief-peek-num">${i + 2}</span>
+               <span class="tag ${x.pillar}">P${xp.number}</span>
+               <span class="brief-peek-title">${x.title || xp.name}</span>
+             </div>`;
+           }).join('')}
+         </div>
+       </details>`
+    : `<div class="brief-peek-empty">Last one in the queue. Say "fill my queue" for more.</div>`;
+
+  root.innerHTML = `
+    <div class="brief-counter">Shoot ${1} of ${total}</div>
+
+    <div class="brief-hero ${b.pillar}">
+      <div class="brief-hero-head">
+        <div class="brief-pillar-badge ${b.pillar}">
+          <span class="brief-pillar-num">P${p.number}</span>
+          <span class="brief-pillar-name">${p.name}</span>
+        </div>
+        <div class="brief-meta">
+          <span>${b.length || p.format}</span>
+          ${b.pin ? '<span class="brief-pin">★ pin this</span>' : ''}
+        </div>
+      </div>
+
+      <div class="brief-title">${b.title || ''}</div>
+
+      ${b.why ? `<div class="brief-why"><span class="brief-why-label">why this · why now</span>${b.why}</div>` : ''}
+
+      <div class="brief-field">
+        <div class="brief-field-label">on screen</div>
+        <div class="brief-onscreen">${onScreenHtml}</div>
+        ${beats.length ? `<button class="btn-copy brief-copy" onclick="copyBeats(this)" data-copy="${beats.join('&#10;')}">Copy text</button>` : ''}
+      </div>
+
+      <div class="brief-field">
+        <div class="brief-field-label">what to say ${b.mechanic ? `<span class="brief-mech">${b.mechanic}</span>` : ''}</div>
+        <div class="brief-say">${b.say || '—'}</div>
+        ${b.say ? `<button class="btn-copy brief-copy" onclick="copyText(this.closest('.brief-field').querySelector('.brief-say').textContent.trim(), this)">Copy line</button>` : ''}
+      </div>
+
+      ${b.arc ? `<div class="brief-field">
+        <div class="brief-field-label">the arc</div>
+        <div class="brief-arc">${b.arc}</div>
+      </div>` : ''}
+
+      <div class="brief-field">
+        <div class="brief-field-label">caption</div>
+        <div class="brief-caption">${b.caption || ''}</div>
+        <div class="brief-hashtags">${b.hashtags || ''}</div>
+        <button class="btn-copy brief-copy" onclick="copyText('${(b.caption || '').replace(/'/g,"\\'")} ${(b.hashtags || '').replace(/'/g,"\\'")}', this)">Copy caption + tags</button>
+      </div>
+
+      <div class="brief-field brief-field-row">
+        <div><div class="brief-field-label">sound</div><div class="brief-mini">${b.sound || '—'}</div></div>
+        <div><div class="brief-field-label">setup</div><div class="brief-mini">warm light · textured wall · clip mic</div></div>
+      </div>
+
+      <div class="brief-actions">
+        <button class="btn brief-btn-posted" onclick="resolveBrief('${b.id}','posted')">Posted ✓</button>
+        <button class="btn-ghost" onclick="resolveBrief('${b.id}','skipped')">Skip</button>
+        <button class="btn-ghost" onclick="snoozeBrief('${b.id}')">Snooze →</button>
+      </div>
+    </div>
+
+    ${peekHtml}
+  `;
+}
+
+// Copy the on-screen beats (stored newline-encoded in data-copy)
+function copyBeats(btn) {
+  const raw = (btn.getAttribute('data-copy') || '').replace(/&#10;/g, '\n');
+  copyText(raw, btn);
+}
+
+async function resolveBrief(id, status) {
+  await Briefs.resolve(id, status);
+  await renderBrief();
+  toast(status === 'posted' ? 'Posted — logged. Next shot up.' : 'Skipped. Next shot up.');
+}
+
+async function snoozeBrief(id) {
+  await Briefs.snooze(id);
+  await renderBrief();
+  toast('Snoozed to the back of the queue.');
 }
 
 // ────────────────────────────────────────────
@@ -544,6 +686,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Init all pages in parallel
   await Promise.all([
+    initBrief(),
     initThursday(),
     initCheckin(),
     initCalendar(),
@@ -555,6 +698,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initHooks();
   initCaptions();
 
-  const last = localStorage.getItem('vb_lastPage') || 'checkin';
+  const last = localStorage.getItem('vb_lastPage') || 'brief';
   navigate(last);
 });

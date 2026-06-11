@@ -593,6 +593,219 @@ button {
   line-height: 1.6;
 }
 
+/* ── The Brief ── */
+.brief-counter {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 12px;
+}
+.brief-hero {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--border-mid);
+  border-radius: var(--radius-lg);
+  padding: 26px 24px 22px;
+}
+.brief-hero.p1 { border-top-color: var(--p1); }
+.brief-hero.p2 { border-top-color: var(--p2); }
+.brief-hero.p3 { border-top-color: var(--p3); }
+
+.brief-hero-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.brief-pillar-badge { display: flex; align-items: baseline; gap: 8px; }
+.brief-pillar-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+.brief-pillar-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.brief-pillar-badge.p1 .brief-pillar-num, .brief-pillar-badge.p1 .brief-pillar-name { color: var(--p1); }
+.brief-pillar-badge.p2 .brief-pillar-num, .brief-pillar-badge.p2 .brief-pillar-name { color: var(--p2); }
+.brief-pillar-badge.p3 .brief-pillar-num, .brief-pillar-badge.p3 .brief-pillar-name { color: var(--p3); }
+.brief-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.brief-pin {
+  color: var(--brand);
+  border: 1px solid rgba(192,57,43,0.4);
+  border-radius: 2px;
+  padding: 2px 7px;
+  font-weight: 600;
+}
+
+.brief-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+
+.brief-why {
+  background: var(--bg3);
+  border-left: 2px solid var(--brand);
+  border-radius: 2px;
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin-bottom: 22px;
+}
+.brief-why-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand);
+  margin-bottom: 6px;
+}
+
+.brief-field { padding: 16px 0; border-bottom: 1px solid var(--border); }
+.brief-field:first-of-type { border-top: 1px solid var(--border); }
+.brief-field-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 10px;
+}
+.brief-mech {
+  color: var(--text-dim);
+  border: 1px solid var(--border-mid);
+  border-radius: 2px;
+  padding: 1px 6px;
+  margin-left: 8px;
+  letter-spacing: 0.06em;
+}
+
+.brief-onscreen { margin-bottom: 10px; }
+.brief-beat {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 19px;
+  line-height: 1.35;
+  color: var(--text);
+}
+.brief-say {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+  font-style: italic;
+  margin-bottom: 10px;
+}
+.brief-arc { font-size: 13px; line-height: 1.7; color: var(--text-dim); }
+.brief-caption {
+  font-size: 15px;
+  color: var(--text);
+  font-style: italic;
+  margin-bottom: 6px;
+}
+.brief-hashtags { font-size: 12px; color: var(--text-faint); margin-bottom: 10px; }
+.brief-copy { margin-top: 2px; }
+
+.brief-field-row { display: flex; gap: 32px; }
+.brief-mini { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+
+.brief-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+.brief-btn-posted { flex: 1; min-width: 140px; }
+
+.brief-peek {
+  margin-top: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.brief-peek summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 16px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.brief-peek summary::-webkit-details-marker { display: none; }
+.brief-peek summary::before { content: '+ '; color: var(--text-faint); }
+.brief-peek[open] summary::before { content: '– '; }
+.brief-peek-list { padding: 0 16px 8px; }
+.brief-peek-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid var(--border);
+}
+.brief-peek-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--text-faint);
+  min-width: 16px;
+}
+.brief-peek-title { font-size: 13px; color: var(--text-dim); }
+.brief-peek-empty {
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--text-faint);
+  text-align: center;
+  padding: 10px;
+}
+
+.brief-empty { text-align: center; padding: 60px 20px; }
+.brief-empty-mark { font-size: 28px; color: var(--text-faint); margin-bottom: 16px; }
+.brief-empty-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.brief-empty-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  max-width: 380px;
+  margin: 0 auto;
+}
+.brief-kbd {
+  background: var(--bg3);
+  border: 1px solid var(--border-mid);
+  border-radius: 2px;
+  padding: 2px 7px;
+  color: var(--text);
+  font-style: italic;
+}
+
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -682,4 +895,13 @@ button {
   .tab-row { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .tab-row::-webkit-scrollbar { display: none; }
   .tab-btn { font-size: 9px; padding: 10px 13px 12px; }
+
+  /* Brief — mobile */
+  .brief-hero { padding: 20px 16px 18px; }
+  .brief-title { font-size: 21px; }
+  .brief-beat { font-size: 17px; }
+  .brief-field-row { flex-direction: column; gap: 16px; }
+  .brief-actions { flex-direction: column; }
+  .brief-btn-posted { width: 100%; }
+  .brief-actions .btn-ghost { width: 100%; }
 }
