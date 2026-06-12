@@ -60,12 +60,102 @@ async function seedBriefsIfNeeded() {
   if (!existing.length && typeof VB_SEED_BRIEFS !== 'undefined') {
     await Briefs.setQueue(VB_SEED_BRIEFS);
   }
+  // Seed post history once so the pulse strip is accurate from first open.
+  // Guarded: only if the archive is still empty — never clobbers real posts.
+  const existingArchive = await Briefs.archive();
+  if (!existingArchive.length && typeof VB_SEED_ARCHIVE !== 'undefined') {
+    await Settings.set('brief_archive', JSON.stringify(VB_SEED_ARCHIVE));
+  }
   await Settings.set('brief_seeded', 'yes');
+}
+
+// ── The pulse strip: cadence + reach at a glance ──
+async function computePulse() {
+  const [queue, archive, followersRaw, targetRaw] = await Promise.all([
+    Briefs.queue(),
+    Briefs.archive(),
+    Settings.get('followers', '29000'),
+    Settings.get('weekly_target', '5'),
+  ]);
+  const posted = (archive || []).filter(b => b.status === 'posted' && b.resolvedAt);
+  let lastPostedAt = null;
+  for (const b of posted) {
+    if (!lastPostedAt || new Date(b.resolvedAt) > new Date(lastPostedAt)) lastPostedAt = b.resolvedAt;
+  }
+  const daysDark = lastPostedAt
+    ? Math.floor((Date.now() - new Date(lastPostedAt).getTime()) / 86400000)
+    : null;
+  const weekAgo = Date.now() - 7 * 86400000;
+  const postsThisWeek = posted.filter(b => new Date(b.resolvedAt).getTime() >= weekAgo).length;
+  const followers = parseInt(followersRaw, 10) || 0;
+  const goal = (typeof VB_DATA !== 'undefined' && VB_DATA.brand && VB_DATA.brand.goal) || 100000;
+  return {
+    followers, goal,
+    goalPct: Math.round((followers / goal) * 100),
+    daysDark, lastPostedAt, postsThisWeek,
+    weeklyTarget: parseInt(targetRaw, 10) || 5,
+    queueCount: (queue || []).length,
+  };
+}
+
+async function renderPulse() {
+  const root = document.getElementById('pulse-root');
+  if (!root) return;
+  const p = await computePulse();
+  const fmtK = n => n >= 1000 ? (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'K' : String(n);
+  const fmtDate = iso => iso
+    ? new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    : '—';
+  const dark = p.daysDark;
+  const alert = dark != null && dark >= 3;
+  const dots = Array.from({ length: p.weeklyTarget },
+    (_, i) => `<i class="${i < p.postsThisWeek ? 'on' : ''}"></i>`).join('');
+  root.innerHTML = `
+    <div class="pulse">
+      <div class="stat ${alert ? 'alert' : ''}">
+        <div class="stat-k">days dark</div>
+        <div class="stat-v">${dark == null ? '—' : dark}</div>
+        <div class="stat-foot">last post ${fmtDate(p.lastPostedAt)}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-k">this week</div>
+        <div class="stat-v">${p.postsThisWeek}<span class="unit"> / ${p.weeklyTarget}</span></div>
+        <div class="week-dots">${dots}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-k">followers</div>
+        <div class="stat-v">${fmtK(p.followers)}<span class="unit"> / ${fmtK(p.goal)}</span></div>
+        <div class="pulse-bar"><i style="width:${Math.min(100, p.goalPct)}%"></i></div>
+      </div>
+      <div class="stat">
+        <div class="stat-k">in the queue</div>
+        <div class="stat-v">${p.queueCount}</div>
+        <div class="stat-foot">${p.queueCount ? 'ready to shoot' : 'say “fill my queue”'}</div>
+      </div>
+    </div>`;
+}
+
+// ── The standing plan ──
+function renderPlan() {
+  const root = document.getElementById('plan-root');
+  if (!root || typeof VB_PLAN === 'undefined') return;
+  root.innerHTML = `
+    <div class="plan-block">
+      <div class="plan-head">THE PLAN <span>why this · why now</span></div>
+      ${VB_PLAN.map(r => `
+        <div class="plan-rule">
+          <div class="plan-rule-h">${r.rule}</div>
+          <div class="plan-rule-d">${r.detail}</div>
+          <div class="plan-rule-e">${r.evidence}</div>
+        </div>`).join('')}
+    </div>`;
 }
 
 async function renderBrief() {
   const root = document.getElementById('brief-root');
   if (!root) return;
+  renderPlan();
+  renderPulse(); // fire-and-forget; updates days-dark/this-week after each post
   const queue = await Briefs.queue();
   const b = queue[0] || null;
 

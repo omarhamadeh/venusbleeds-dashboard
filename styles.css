@@ -905,3 +905,115 @@ button {
   .brief-btn-posted { width: 100%; }
   .brief-actions .btn-ghost { width: 100%; }
 }
+
+/* ── Pulse strip (cadence centerpiece) ── */
+.pulse {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.pulse .stat {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 13px 14px 12px;
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.pulse .stat-k {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.pulse .stat-v {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-top: 8px;
+  color: var(--text);
+}
+.pulse .stat-v .unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 0;
+}
+.pulse .stat-foot {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+.pulse .stat.alert {
+  border-color: rgba(192,57,43,0.5);
+  background: rgba(192,57,43,0.06);
+}
+.pulse .stat.alert .stat-v { color: var(--brand); }
+.pulse-bar {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--bg4, #1a1a1a);
+  overflow: hidden;
+  margin-top: 10px;
+}
+.pulse-bar > i {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+  border-radius: 99px;
+}
+.week-dots { display: flex; gap: 4px; margin-top: 9px; }
+.week-dots i {
+  width: 8px; height: 8px;
+  border-radius: 99px;
+  background: var(--bg4, #1a1a1a);
+  display: inline-block;
+}
+.week-dots i.on { background: var(--text); }
+
+/* ── The standing plan ── */
+.plan-block {
+  margin-top: 20px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px 8px;
+}
+.plan-head {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.plan-head span {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--text-faint);
+  margin-left: 8px;
+}
+.plan-rule {
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+}
+.plan-rule:first-of-type { border-top: none; }
+.plan-rule-h {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+}
+.plan-rule-d { font-size: 13px; line-height: 1.5; color: var(--text); margin-top: 4px; }
+.plan-rule-e { font-size: 12px; line-height: 1.45; color: var(--text-dim); font-style: italic; margin-top: 6px; }

@@ -279,3 +279,35 @@ const VB_SEED_BRIEFS = [
     hashtags: "#darkpop #queerartist #altpop #independentartist #venusbleeds",
   },
 ];
+
+// ── The standing plan: 3 correction rules from the latest audit ──
+// Static content — change here when the strategy shifts.
+const VB_PLAN = [
+  {
+    rule: "Convert inside the right room.",
+    detail: "Stay in male / diaspora-legible territory — P1 identity, P2 diaspora, P3 music. Not hijab or body-politics debate.",
+    evidence: "Last viral wave was 77–80% female. Huge reach, near-zero conversion — it grew the wrong audience.",
+  },
+  {
+    rule: "Reach, then depth — within 48h.",
+    detail: "Every spike needs a deeper follow-up posted fast, while the wave is still returning to your profile.",
+    evidence: "The 33-second follow-up converted 5× the viral post (0.24% vs 0.045%) by catching returning viewers.",
+  },
+  {
+    rule: "First word is the hook.",
+    detail: "If the opening line doesn't stop the swipe at second 1, nothing after it matters. Lead with the sharpest word.",
+    evidence: "Multiple posts flagged 'most viewers stopped at 0:01' — the hook never passed the first-word test.",
+  },
+];
+
+// ── Seed post history (the June 1–10 audited posts) ──
+// Loads into brief_archive once, guarded, so the pulse strip (days dark / posts
+// this week) is accurate from the very first open. Never overwrites real posts.
+const VB_SEED_ARCHIVE = [
+  { id: "a-hijab", pillar: "p1", title: "#hijab P1 (1.4M)", status: "posted", resolvedAt: "2026-06-04T12:00:00.000Z", note: "viral loop machine — elite watch-time, weak conversion (0.045%), grew wrong room (77% F)" },
+  { id: "a-hijab-followup", pillar: "p1", title: "#hijab 33s follow-up", status: "posted", resolvedAt: "2026-06-05T12:00:00.000Z", note: "best data point of the week — 0.24% CVR, 5x the viral post. reach-then-depth works." },
+  { id: "a-yseult-v1", pillar: "p3", title: "#yseult (first attempt)", status: "posted", resolvedAt: "2026-06-05T18:00:00.000Z", note: "right territory, no format — 2.22s avg watch, FYP rejected it. redo is in the queue." },
+  { id: "a-p2-women", pillar: "p2", title: "some women's choices (P2)", status: "posted", resolvedAt: "2026-06-02T12:00:00.000Z", note: "healthy like rate but hook failed first-word test; lost the room by sec 1." },
+  { id: "a-untitled", pillar: "p1", title: "untitled 0:48 (no caption)", status: "posted", resolvedAt: "2026-06-02T15:00:00.000Z", note: "caption-rule violation — decent body, no packaging." },
+  { id: "a-networking", pillar: "p2", title: "i left the networking event", status: "posted", resolvedAt: "2026-06-04T18:00:00.000Z", note: "69% profile traffic — FYP barely touched it." },
+];
